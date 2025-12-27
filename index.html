@@ -1,285 +1,257 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hasaan's Calculator</title>
-  <style>
-    :root{
-      --bg:#0b1020; --panel:rgba(255,255,255,0.04); --accent:#7afcff; --accent-2:#7b61ff; --glass:rgba(255,255,255,0.03);
-      --txt:#e6f0ff; --muted:#9aa8bf;
-      --pad:clamp(10px,2.5vw,18px);
-      --btn-pad:clamp(12px,3vw,16px);
-      --btn-font:clamp(16px,2.6vw,18px);
-      --display-font:clamp(20px,5vw,32px);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto; background:radial-gradient(1200px 600px at 10% 10%,#07102b 0%, transparent 20%), radial-gradient(900px 500px at 90% 90%,#081218 0%, transparent 22%), var(--bg);
-      color:var(--txt); display:flex; align-items:center; justify-content:center; padding:clamp(12px,4vw,32px);
-    }
-    .calc{
-      width:clamp(300px,92vw,420px); border-radius:18px; padding:var(--pad); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); box-shadow: 0 8px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
-      backdrop-filter: blur(8px) saturate(130%);
-    }
-    .header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
-    .brand{display:flex; gap:12px; align-items:center}
-    .logo{width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:0 6px 18px rgba(123,97,255,0.12); display:flex; align-items:center; justify-content:center; font-weight:700}
-    .brand h1{font-size:14px;margin:0}
-    .sub{font-size:11px;color:var(--muted); margin-top:2px}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hasaan's Hacker Calculator</title>
 
-    .display{background:var(--panel); padding:12px; border-radius:12px; text-align:right; min-height:clamp(64px,12vw,96px); display:flex; flex-direction:column; justify-content:center; gap:6px}
-    .out-small{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis}
-    .out-main{font-size:var(--display-font); font-weight:600; word-break:break-all}
+<style>
+:root{
+  --bg:#030000;
+  --panel:rgba(255,0,0,0.08);
+  --glass:rgba(255,0,0,0.04);
+  --accent:#ff1e1e;
+  --accent-2:#8b0000;
+  --txt:#ffecec;
+  --muted:#ff6b6b;
+  --pad:clamp(10px,2.5vw,18px);
+  --btn-pad:clamp(12px,3vw,16px);
+  --btn-font:clamp(16px,2.6vw,18px);
+  --display-font:clamp(20px,5vw,32px);
+}
 
-    .keys{display:grid; grid-template-columns:repeat(4,1fr); grid-auto-rows:minmax(52px,auto); gap:clamp(8px,2.2vw,12px); margin-top:12px}
-    button.key{padding:var(--btn-pad); border-radius:10px; border:0; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:var(--txt); font-size:var(--btn-font); box-shadow: 0 6px 14px rgba(2,6,23,0.5); cursor:pointer; min-height:44px; touch-action:manipulation}
-    button.key.op{background:linear-gradient(180deg,var(--accent),var(--accent-2)); color:#021124}
-    button.wide{grid-column:span 2}
-    button.clear{background:linear-gradient(180deg,#ff6b6b,#ff4757); color:white}
+*{box-sizing:border-box}
+html,body{height:100%}
 
-    .footer{display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:12px; color:var(--muted); gap:8px; flex-wrap:wrap}
-    .tiny-btn{background:transparent;border:1px solid rgba(255,255,255,0.04); padding:6px 8px; border-radius:8px; color:var(--muted)}
+body{
+  margin:0;
+  font-family:"Courier New", monospace;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,0,0,0.05) 0px,
+      rgba(255,0,0,0.05) 1px,
+      transparent 2px,
+      transparent 4px
+    ),
+    radial-gradient(900px 400px at 50% 0%, rgba(255,0,0,0.2), transparent 60%),
+    var(--bg);
+  color:var(--txt);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
 
-    /* Small screens tweaks */
-    @media (max-width:420px){
-      .brand h1{font-size:13px}
-      .sub{font-size:10px}
-      .out-small{display:none}
-      .keys{gap:8px}
-      button.key{min-height:56px}
-      .footer{font-size:11px}
-    }
+/* Calculator shell */
+.calc{
+  width:360px;
+  background:rgba(0,0,0,0.9);
+  border:1px solid rgba(255,0,0,0.4);
+  border-radius:10px;
+  padding:var(--pad);
+  box-shadow:
+    0 0 40px rgba(255,0,0,0.35),
+    inset 0 0 25px rgba(255,0,0,0.25);
+}
 
-    /* Very small / narrow devices */
-    @media (max-width:340px){
-      .logo{width:38px;height:38px}
-      .out-main{font-size:clamp(18px,6vw,26px)}
-      button.key{padding:10px;font-size:15px}
-      .calc{padding:10px}
-    }
-  </style>
+/* Header */
+.header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:6px;
+  background:linear-gradient(135deg,#ff1e1e,#7a0000);
+  box-shadow:
+    0 0 12px rgba(255,0,0,0.8),
+    0 0 30px rgba(255,0,0,0.3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  color:black;
+}
+
+.brand h1{
+  margin:0;
+  font-size:14px;
+}
+
+.sub{
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* Display */
+.display{
+  background:#000;
+  border:1px solid rgba(255,0,0,0.4);
+  border-radius:6px;
+  padding:12px;
+  min-height:80px;
+  box-shadow: inset 0 0 20px rgba(255,0,0,0.35);
+}
+
+.out-small{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.out-main{
+  font-size:var(--display-font);
+  font-weight:bold;
+  text-shadow:
+    0 0 6px rgba(255,0,0,0.7),
+    0 0 14px rgba(255,0,0,0.4);
+  word-break:break-all;
+}
+
+/* Keys */
+.keys{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+
+button{
+  padding:var(--btn-pad);
+  border-radius:6px;
+  border:1px solid rgba(255,0,0,0.3);
+  background:#0a0000;
+  color:#ff4d4d;
+  font-size:var(--btn-font);
+  cursor:pointer;
+  box-shadow:
+    inset 0 -2px 0 rgba(255,0,0,0.3),
+    0 0 10px rgba(255,0,0,0.15);
+}
+
+button:hover{
+  box-shadow:0 0 18px rgba(255,0,0,0.6);
+}
+
+.op{
+  background:linear-gradient(180deg,#ff1e1e,#8b0000);
+  color:black;
+}
+
+.clear{
+  background:linear-gradient(180deg,#ff4d4d,#b30000);
+  color:black;
+}
+
+.wide{grid-column:span 2}
+
+/* Footer */
+.footer{
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+  display:flex;
+  justify-content:space-between;
+}
+</style>
 </head>
+
 <body>
-  <canvas id="particles"></canvas>
-  <main class="calc" role="application" aria-label="Futuristic calculator">
-    <div class="header">
-      <div class="brand">
-        <div class="logo">MM</div>
-        <div>
-          <h1>Hasaan's Calculator</h1>
-          <div class="sub">Precision, keyboard & touch ready</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="theme" class="tiny-btn">Theme</button>
-      </div>
+<main class="calc">
+  <div class="header">
+    <div class="logo">HX</div>
+    <div class="brand">
+      <h1>Hasaan's Hacker Calc</h1>
+      <div class="sub">root@terminal</div>
     </div>
+  </div>
 
-    <div class="display" id="display">
-      <div class="out-small" id="history"> </div>
-      <div class="out-main" id="result">0</div>
-    </div>
+  <div class="display">
+    <div class="out-small" id="history"></div>
+    <div class="out-main" id="result">0</div>
+  </div>
 
-    <div class="keys" id="keys">
-      <button class="key clear" data-action="clear">C</button>
-      <button class="key" data-action="back">DEL</button>
-      <button class="key" data-action="percent">%</button>
-      <button class="key op" data-value="/">÷</button>
+  <div class="keys">
+    <button class="clear" data-action="clear">C</button>
+    <button data-action="back">DEL</button>
+    <button data-action="percent">%</button>
+    <button class="op" data-value="/">÷</button>
 
-      <button class="key" data-value="7">7</button>
-      <button class="key" data-value="8">8</button>
-      <button class="key" data-value="9">9</button>
-      <button class="key op" data-value="*">×</button>
+    <button data-value="7">7</button>
+    <button data-value="8">8</button>
+    <button data-value="9">9</button>
+    <button class="op" data-value="*">×</button>
 
-      <button class="key" data-value="4">4</button>
-      <button class="key" data-value="5">5</button>
-      <button class="key" data-value="6">6</button>
-      <button class="key op" data-value="-">−</button>
+    <button data-value="4">4</button>
+    <button data-value="5">5</button>
+    <button data-value="6">6</button>
+    <button class="op" data-value="-">−</button>
 
-      <button class="key" data-value="1">1</button>
-      <button class="key" data-value="2">2</button>
-      <button class="key" data-value="3">3</button>
-      <button class="key op" data-value="+">+</button>
+    <button data-value="1">1</button>
+    <button data-value="2">2</button>
+    <button data-value="3">3</button>
+    <button class="op" data-value="+">+</button>
 
-      <button class="key wide" data-value="0">0</button>
-      <button class="key" data-value=".">.</button>
-      <button class="key op" data-action="equals">=</button>
-    </div>
+    <button class="wide" data-value="0">0</button>
+    <button data-value=".">.</button>
+    <button class="op" data-action="equals">=</button>
+  </div>
 
-    <div class="footer">
-      <div>Memory: <span id="mem">0</span></div>
-      <div style="display:flex;gap:8px">
-        <button class="tiny-btn" id="mplus">M+</button>
-        <button class="tiny-btn" id="mminus">M-</button>
-        <button class="tiny-btn" id="mrec">MR</button>
-        <button class="tiny-btn" id="mclr">MC</button>
-      </div>
-    </div>
-  </main>
+  <div class="footer">
+    <div>Memory: <span id="mem">0</span></div>
+  </div>
+</main>
 
-  <script>
-    // Particles background (runs before calculator script)
-    (function(){
-      const canvas = document.getElementById('particles');
-      const ctx = canvas.getContext('2d');
-      let DPR = Math.max(1, window.devicePixelRatio || 1);
-      let particles = [];
+<script>
+const resultEl = document.getElementById("result");
+const historyEl = document.getElementById("history");
+const keys = document.querySelector(".keys");
+const memEl = document.getElementById("mem");
 
-      function resize(){
-        DPR = Math.max(1, window.devicePixelRatio || 1);
-        canvas.width = Math.floor(window.innerWidth * DPR);
-        canvas.height = Math.floor(window.innerHeight * DPR);
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        ctx.setTransform(DPR,0,0,DPR,0,0);
-        // recalc particle count
-        const area = window.innerWidth * window.innerHeight;
-        const target = Math.min(160, Math.max(40, Math.floor(area / 9000)));
-        while(particles.length < target) particles.push(createParticle());
-        while(particles.length > target) particles.pop();
-      }
+let expr = "";
+let mem = 0;
 
-      function rand(a,b){ return a + Math.random()*(b-a); }
+function render(){
+  historyEl.textContent = expr;
+  resultEl.textContent = expr || "0";
+}
 
-      function createParticle(){
-        const w = window.innerWidth, h = window.innerHeight;
-        const speed = rand(0.05, 0.6);
-        const angle = rand(-Math.PI/3, Math.PI/3) - Math.PI/2; // generally upwards
-        const p = {
-          x: rand(0, w),
-          y: rand(h*0.2, h*1.1),
-          vx: Math.cos(angle)*speed,
-          vy: Math.sin(angle)*speed,
-          size: rand(0.6, 3.4),
-          hue: rand(180, 280),
-          alpha: rand(0.05,0.9),
-          life: rand(80, 220)
-        };
-        return p;
-      }
+function evaluateExpr(e){
+  e = e.replace(/×/g,"*").replace(/÷/g,"/").replace(/−/g,"-");
+  e = e.replace(/(\d+(?:\.\d+)?)%/g,"($1/100)");
+  return Function("return ("+e+")")();
+}
 
-      function draw(){
-        ctx.clearRect(0,0,canvas.width/DPR, canvas.height/DPR);
-        // subtle gradient overlay for depth
-        const g = ctx.createLinearGradient(0,0,0,window.innerHeight);
-        g.addColorStop(0, 'rgba(12,20,40,0.0)');
-        g.addColorStop(1, 'rgba(2,6,12,0.12)');
-        ctx.fillStyle = g;
-        ctx.fillRect(0,0,window.innerWidth, window.innerHeight);
+keys.addEventListener("click",e=>{
+  const b = e.target.closest("button");
+  if(!b) return;
 
-        ctx.save();
-        ctx.globalCompositeOperation = 'lighter';
-        for(let i=0;i<particles.length;i++){
-          const p = particles[i];
-          // move
-          p.x += p.vx;
-          p.y += p.vy;
-          p.life -= 1;
-          // respawn when off-screen or life ended
-          if(p.y < -50 || p.x < -50 || p.x > window.innerWidth+50 || p.life <= 0){
-            particles[i] = createParticle();
-            continue;
-          }
+  if(b.dataset.action==="clear"){expr="";render();return;}
+  if(b.dataset.action==="back"){expr=expr.slice(0,-1);render();return;}
+  if(b.dataset.action==="percent"){expr+="%";render();return;}
+  if(b.dataset.action==="equals"){
+    try{
+      expr=String(+evaluateExpr(expr).toFixed(12));
+    }catch{
+      expr="ERROR";
+    }
+    render();
+    return;
+  }
+  if(b.dataset.value){expr+=b.dataset.value;render();}
+});
 
-          const rad = p.size;
-          ctx.beginPath();
-          const hue = p.hue;
-          ctx.fillStyle = `hsla(${hue}, 90%, 60%, ${p.alpha})`;
-          ctx.shadowColor = `hsla(${hue}, 90%, 60%, ${Math.min(0.85,p.alpha)})`;
-          ctx.shadowBlur = Math.max(6, rad*6);
-          ctx.arc(p.x, p.y, rad, 0, Math.PI*2);
-          ctx.fill();
-        }
-        ctx.restore();
-      }
-
-      let rafId = null;
-      function loop(){ draw(); rafId = requestAnimationFrame(loop); }
-
-      // ensure background behind calculator
-      canvas.style.position = 'fixed';
-      canvas.style.left = '0';
-      canvas.style.top = '0';
-      canvas.style.zIndex = '0';
-      canvas.style.pointerEvents = 'none';
-
-      // ensure calc is above
-      const calcEl = document.querySelector('.calc');
-      if(calcEl) calcEl.style.position = 'relative', calcEl.style.zIndex = '1';
-
-      window.addEventListener('resize', resize, {passive:true});
-      resize();
-      loop();
-    })();
-
-    (function(){
-      const resultEl = document.getElementById('result');
-      const historyEl = document.getElementById('history');
-      const keys = document.getElementById('keys');
-      const memEl = document.getElementById('mem');
-      let expr = '';
-      let mem = 0;
-
-      function render(){
-        historyEl.textContent = expr || '';
-        resultEl.textContent = expr ? expr : '0';
-      }
-
-      function sanitizeExpression(e){
-        // replace visual symbols
-        e = e.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
-        // handle percent occurrences: convert 'number%' to '(number/100)'
-        e = e.replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
-        return e;
-      }
-
-      function evaluateExpression(e){
-        e = sanitizeExpression(e);
-        // allow only digits, operators, decimal, parentheses and spaces after sanitization
-        if(!/^[0-9+\-*/().%\s]+$/.test(e)) throw new Error('Invalid expression');
-        // safe-ish evaluation
-        // eslint-disable-next-line no-new-func
-        return Function('return (' + e + ')')();
-      }
-
-      keys.addEventListener('click', (ev)=>{
-        const btn = ev.target.closest('button'); if(!btn) return;
-        const v = btn.dataset.value; const action = btn.dataset.action;
-        if(action==='clear'){ expr=''; render(); return }
-        if(action==='back'){ expr = expr.slice(0,-1); render(); return }
-        if(action==='percent'){ expr += '%'; render(); return }
-        if(action==='equals'){ try{ const val = evaluateExpression(expr); expr = String(+parseFloat(val.toFixed(12))); render(); } catch(e){ resultEl.textContent = 'Error' } return }
-        if(v){ expr += v; render(); }
-      });
-
-      // keyboard support
-      window.addEventListener('keydown', (e)=>{
-        if(e.key === 'Enter'){ e.preventDefault(); document.querySelector('[data-action="equals"]').click(); return }
-        if(e.key === 'Backspace'){ e.preventDefault(); document.querySelector('[data-action="back"]').click(); return }
-        if(e.key === 'Escape'){ e.preventDefault(); document.querySelector('[data-action="clear"]').click(); return }
-        const map = {'/':'/','*':'*','-':'-','+':'+','.':'.','%':'%','(':'(',')':')'};
-        if(/[0-9]/.test(e.key) || map[e.key]){ e.preventDefault(); expr += e.key; render(); }
-      });
-
-      // memory buttons
-      document.getElementById('mplus').addEventListener('click', ()=>{ try{ mem += Number(evaluateExpression(expr||'0')) }catch(e){} memEl.textContent = mem; });
-      document.getElementById('mminus').addEventListener('click', ()=>{ try{ mem -= Number(evaluateExpression(expr||'0')) }catch(e){} memEl.textContent = mem; });
-      document.getElementById('mrec').addEventListener('click', ()=>{ expr += String(mem); render(); });
-      document.getElementById('mclr').addEventListener('click', ()=>{ mem = 0; memEl.textContent = '0'; });
-
-      // theme toggle (simple invert)
-      const themeBtn = document.getElementById('theme');
-      let dark = true;
-      themeBtn.addEventListener('click', ()=>{
-        if(dark){ document.documentElement.style.setProperty('--bg','#f6f9ff'); document.documentElement.style.setProperty('--txt','#04203a'); document.documentElement.style.setProperty('--panel','rgba(2,6,23,0.04)'); dark=false; themeBtn.textContent='Dark' }
-        else{ document.documentElement.style.setProperty('--bg','#0b1020'); document.documentElement.style.setProperty('--txt','#e6f0ff'); document.documentElement.style.setProperty('--panel','rgba(255,255,255,0.04)'); dark=true; themeBtn.textContent='Theme' }
-      });
-
-      // initial
-      render();
-    })();
-  </script>
+window.addEventListener("keydown",e=>{
+  if(/[0-9+\-*/.%]/.test(e.key)){
+    expr+=e.key;render();
+  }
+  if(e.key==="Enter"){expr=String(evaluateExpr(expr));render();}
+  if(e.key==="Backspace"){expr=expr.slice(0,-1);render();}
+});
+</script>
 </body>
 </html>
